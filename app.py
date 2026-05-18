@@ -125,7 +125,7 @@ if st.button("Get Weather"):
             # ============================================
 
             st.success(f"Weather in {city_name}, {country}")
-            if temp > 30:
+            if temperature > 30:
                 st.warning("It's extremely hot outside!")
             elif temp > 15:
                 st.info("Cold weather detected!")
@@ -169,7 +169,7 @@ if st.button("Get Weather"):
                 df,
                 x="Category",
                 y="Values",
-                titles="Weather Statistics",
+                title="Weather Statistics",
                 text="Values",
             )
             
