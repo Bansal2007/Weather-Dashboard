@@ -127,7 +127,7 @@ if st.button("Get Weather"):
             st.success(f"Weather in {city_name}, {country}")
             if temperature > 30:
                 st.warning("It's extremely hot outside!")
-            elif temp > 15:
+            elif temperature > 15:
                 st.info("Cold weather detected!")
             else:
                 st.success("Weather is pleasant today!")
@@ -200,12 +200,6 @@ if page == "About Project":
              -Responsive UI
              -Live weather updates
              """)
-    
-st.markdown("===")
-st.markdown(
-    "Developed using python, streamlit, plotly, and openweather api"
-)
-             
 
 
 
