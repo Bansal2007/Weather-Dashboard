@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 # ============================================
 # PAGE CONFIG
@@ -18,33 +19,41 @@ st.set_page_config(
 # ============================================
 
 st.markdown("""
-    <style>
-    .main {
-        background-color: #0E1117;
-        color: white;
-    }
+<style>
 
-    .stTextInput>div>div>input {
-        background-color: #262730;
-        color: white;
-    }
+.main {
+    background: linear-gradient(to right, #141e30, #243b55);
+    color: white;
+}
 
-    .weather-card {
-        background-color: #1E1E1E;
-        padding: 20px;
-        border-radius: 15px;
-        text-align: center;
-        box-shadow: 0px 0px 10px rgba(255,255,255,0.1);
-    }
+.title {
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
+    color: #00BFFF;
+}
 
-    .title {
-        text-align: center;
-        font-size: 45px;
-        font-weight: bold;
-        color: #00BFFF;
-    }
+.stTextInput input {
+    border-radius: 12px;
+    background-color: #1E1E1E;
+    color: white;
+}
 
-    </style>
+div.stButton > button {
+    background-color: #00BFFF;
+    color: white;
+    border-radius: 12px;
+    height: 50px;
+    width: 220px;
+    font-size: 18px;
+    border: none;
+}
+
+div.stButton > button:hover {
+    background-color: #009acd;
+}
+
+</style>
 """, unsafe_allow_html=True)
 
 # ============================================
@@ -52,6 +61,12 @@ st.markdown("""
 # ============================================
 
 st.markdown("<div class='title'>🌦️ Weather Dashboard</div>", unsafe_allow_html=True)
+
+st.sidebar.title("🌍 Weather Dashboard")
+
+page = st.sidebar.radio(
+    "Navigation", 
+    ["Home", "Weather Analytics", "About Project"])
 
 st.write("## Real-Time Weather Forecast Application")
 
@@ -79,7 +94,8 @@ if st.button("Get Weather"):
 
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
 
-        response = requests.get(url)
+        with st.spinner("Fetching weather data..."):
+            response = requests.get(url)
 
         if response.status_code == 200:
 
@@ -97,6 +113,7 @@ if st.button("Get Weather"):
             pressure = data["main"]["pressure"]
 
             wind_speed = data["wind"]["speed"]
+            visibility = data["visibility"] / 1000
 
             description = data["weather"][0]["description"]
             icon = data["weather"][0]["icon"]
@@ -108,6 +125,12 @@ if st.button("Get Weather"):
             # ============================================
 
             st.success(f"Weather in {city_name}, {country}")
+            if temp > 30:
+                st.warning("It's extremely hot outside!")
+            elif temp > 15:
+                st.info("Cold weather detected!")
+            else:
+                st.success("Weather is pleasant today!")
 
             col1, col2 = st.columns(2)
 
@@ -125,6 +148,7 @@ if st.button("Get Weather"):
             col1, col2, col3 = st.columns(3)
 
             col1.metric("Humidity", f"{humidity}%")
+            st.write(f"### Visibility: {visibility} km")
             col2.metric("Pressure", f"{pressure} hPa")
             col3.metric("Wind Speed", f"{wind_speed} m/s")
 
@@ -141,17 +165,47 @@ if st.button("Get Weather"):
 
             df = pd.DataFrame(weather_data)
 
-            fig, ax = plt.subplots(figsize=(8,5))
-
-            ax.bar(df["Category"], df["Values"])
-
-            ax.set_title("Weather Statistics")
-
-            st.pyplot(fig)
+            fig = px.bar(
+                df,
+                x="Category",
+                y="Values",
+                titles="Weather Statistics",
+                text="Values",
+            )
+            
+            st.plotly_chart(fig, use_container_width=True)
 
         else:
             st.error("❌ City not found")
 
+# ============================================
+# ABOUT PAGE
+# ============================================
+
+if page == "About Project":
+    st.write("## About This Project")
+    
+    st.write("""
+             This Weather Dashboard was developed using:
+             
+             -Python
+             -Streamlit
+             -OpenWeather REST API
+             -Plotly for data visualization
+             -pandas for data manipulation
+             
+             Features include:
+             -Real-time weather data fetching
+             -Interactive visualizations
+             -Responsive UI
+             -Live weather updates
+             """)
+    
+st.markdown("===")
+st.markdown(
+    "Developed using python, streamlit, plotly, and openweather api"
+)
+             
 
 
 
